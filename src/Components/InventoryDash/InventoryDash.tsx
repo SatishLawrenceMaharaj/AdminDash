@@ -1,8 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Product, User } from "../UserDash/User";
-import { Edit, Eye, Trash2, X } from "lucide-react"; // Importing X icon for close button
-import Chart from "./Chart"; // Adjust the import path according to your setup
+import { Edit, Eye, Trash2, X } from "lucide-react";
+import Chart from "./Chart";
+import PieChart from "./PieChart";
 
 interface InventoryDashProps {
   allData: User[];
@@ -15,6 +16,11 @@ const InventoryDash: React.FC<InventoryDashProps> = ({ allData }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isViewing, setIsViewing] = useState<boolean>(false);
+
+  // State for managing products
+  const [products, setProducts] = useState<Product[]>(() =>
+    allData.flatMap((user) => user.products)
+  );
 
   const handleSort = (column: string) => {
     const newDirection =
@@ -45,21 +51,21 @@ const InventoryDash: React.FC<InventoryDashProps> = ({ allData }) => {
     console.log("Product clicked:", product);
   };
 
-  const handleDeleteProduct = (productId: number) => {
-    // Implement delete product logic here
+  const handleDeleteProduct = useCallback((productId: number) => {
+    // Remove the product from the state
+    setProducts((prevProducts) =>
+      prevProducts.filter((product) => product.id !== productId)
+    );
     console.log("Product deleted:", productId);
-  };
+  }, []);
 
   const handleCancel = () => {
     setIsViewing(false);
     setSelectedProduct(null);
   };
 
-  // Flatten all products into a single array for table display
-  const allProducts = allData.flatMap((user) => user.products);
-
   // Count the number of users for each product
-  const productUserCount = allProducts.reduce((acc, product) => {
+  const productUserCount = products.reduce((acc, product) => {
     if (!acc[product.id]) {
       acc[product.id] = { ...product, userCount: 0 };
     }
@@ -97,7 +103,6 @@ const InventoryDash: React.FC<InventoryDashProps> = ({ allData }) => {
           const aValue = a[sortColumn as keyof typeof a];
           const bValue = b[sortColumn as keyof typeof b];
 
-          // Handling numeric values and string values differently
           if (typeof aValue === "number" && typeof bValue === "number") {
             return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
           } else if (typeof aValue === "string" && typeof bValue === "string") {
@@ -315,12 +320,12 @@ const InventoryDash: React.FC<InventoryDashProps> = ({ allData }) => {
         </table>
       </div>
 
-      {/* Modal for Viewing Product */}
+      {/* Product View Modal */}
       {isViewing && selectedProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-gray-900 bg-opacity-50 dark:bg-gray-800 backdrop-blur-sm z-40"></div>
 
-          <div className="relative bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg w-11/12 md:w-1/2 lg:w-1/3 h-[90vh] overflow-y-auto z-50">
+          <div className="relative bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2 h-[90vh] overflow-y-auto z-50">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
                 Product Details
@@ -346,32 +351,20 @@ const InventoryDash: React.FC<InventoryDashProps> = ({ allData }) => {
                 <strong>SKU:</strong> {selectedProduct.sku}
               </p>
             </div>
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                Sales Data
-              </h3>
-              <Chart data={selectedProduct.data} />
-            </div>
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                Users Who Own This Product
-              </h3>
-              <ul className="list-disc pl-5">
-                {usersForProduct.length > 0 ? (
-                  usersForProduct.map((user) => (
-                    <li
-                      key={user.id}
-                      className="text-gray-700 dark:text-gray-300"
-                    >
-                      {user.name}
-                    </li>
-                  ))
-                ) : (
-                  <li className="text-gray-700 dark:text-gray-300">
-                    No users found.
-                  </li>
-                )}
-              </ul>
+            <div className="flex flex-col md:flex-row gap-4 mb-4">
+              <div className="flex-1">
+                <Chart data={selectedProduct.data} />
+              </div>
+              <div className="flex-1">
+                <PieChart
+                  data={usersForProduct.map((user) => ({
+                    userName: user.name,
+                    quantity: user.products.find(
+                      (p) => p.id === selectedProduct.id
+                    )!.quantity,
+                  }))}
+                />
+              </div>
             </div>
             <button
               onClick={handleCancel}
