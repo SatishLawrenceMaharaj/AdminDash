@@ -20,7 +20,7 @@ export const allData = [
         name: "Luxury Watch",
         type: "Jewelry",
         value: 500,
-        quantity: 5,
+        quantity: 15,
         sku: "JEWL-001",
         status: "in stock",
         data: [
@@ -37,9 +37,9 @@ export const allData = [
         name: "Diamond Necklace",
         type: "Jewelry",
         value: 1000,
-        quantity: 2,
+        quantity: 0,
         sku: "JEWL-002",
-        status: "in stock",
+        status: "out of stock",
         data: [
           { name: "Jan", quantity: 10, value: 1000 },
           { name: "Feb", quantity: 8, value: 800 },
@@ -73,7 +73,7 @@ export const allData = [
         name: "Power Drill",
         type: "Tools",
         value: 250,
-        quantity: 10,
+        quantity: 11,
         sku: "TOOL-001",
         status: "in stock",
         data: [
@@ -90,7 +90,7 @@ export const allData = [
         name: "Cordless Screwdriver",
         type: "Tools",
         value: 150,
-        quantity: 7,
+        quantity: 17,
         sku: "TOOL-002",
         status: "in stock",
         data: [
@@ -143,7 +143,7 @@ export const allData = [
         name: "Dining Table",
         type: "Furniture",
         value: 800,
-        quantity: 1,
+        quantity: 11,
         sku: "FURN-002",
         status: "in stock",
         data: [
@@ -168,7 +168,7 @@ export const allData = [
     image: "https://via.placeholder.com/150",
     location: { lat: 41.8781, lng: -87.6298 }, // Chicago
     registrationDate: "2024-08-01",
-    totalOrders: 10,
+    totalOrders: 0,
     activityData: [
       { date: "2024-09-02", loginCount: 4, engagementTime: 90 },
       { date: "2024-09-03", loginCount: 3, engagementTime: 65 },
@@ -181,7 +181,7 @@ export const allData = [
         value: 2000,
         quantity: 2,
         sku: "ENT-001",
-        status: "in stock",
+        status: "low stock",
         data: [
           { name: "Jan", quantity: 3, value: 6000 },
           { name: "Feb", quantity: 4, value: 8000 },
@@ -196,7 +196,7 @@ export const allData = [
         name: "4K TV",
         type: "Home Entertainment",
         value: 1500,
-        quantity: 1,
+        quantity: 11,
         sku: "ENT-002",
         status: "in stock",
         data: [

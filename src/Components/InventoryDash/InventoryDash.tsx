@@ -14,7 +14,8 @@ const InventoryDash: React.FC<InventoryDashProps> = ({ allData }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   const handleSort = (column: string) => {
-    const newDirection = sortColumn === column && sortDirection === "asc" ? "desc" : "asc";
+    const newDirection =
+      sortColumn === column && sortDirection === "asc" ? "desc" : "asc";
     setSortColumn(column);
     setSortDirection(newDirection);
   };
@@ -62,54 +63,65 @@ const InventoryDash: React.FC<InventoryDashProps> = ({ allData }) => {
   const productList = Object.values(productUserCount);
 
   // Apply filtering based on stock status
-  const filteredByStockStatus = productList.filter(product => {
-    switch (filterType) {
-      case "in-stock":
-        return product.quantity > 0;
-      case "low-stock":
-        return product.quantity <= 0 && product.quantity > -10; // Adjust threshold as needed
-      case "out-of-stock":
-        return product.quantity <= -10; // Adjust threshold as needed
-      case "all":
-      default:
-        return true;
-    }
-  });
+  const filteredByStockStatus = React.useMemo(
+    () => productList.filter(product => {
+      switch (filterType) {
+        case "in-stock":
+          return product.quantity > 10;
+        case "low-stock":
+          return product.quantity <= 10 && product.quantity > 0;
+        case "out-of-stock":
+          return product.quantity <= 0;
+        case "all":
+        default:
+          return true;
+      }
+    }),
+    [filterType, productList]
+  );
 
   // Apply sorting
-  const sortedProducts = filteredByStockStatus.slice().sort((a, b) => {
-    if (sortColumn) {
-      const aValue = a[sortColumn as keyof typeof a];
-      const bValue = b[sortColumn as keyof typeof b];
-      if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
-      if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
+  const sortedProducts = React.useMemo(
+    () => filteredByStockStatus.slice().sort((a, b) => {
+      if (sortColumn) {
+        const aValue = a[sortColumn as keyof typeof a];
+        const bValue = b[sortColumn as keyof typeof b];
+
+        // Handling numeric values and string values differently
+        if (typeof aValue === "number" && typeof bValue === "number") {
+          return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
+        } else if (typeof aValue === "string" && typeof bValue === "string") {
+          return sortDirection === "asc"
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue);
+        }
+      }
       return 0;
-    }
-    return 0;
-  });
+    }),
+    [filteredByStockStatus, sortColumn, sortDirection]
+  );
 
   // Apply search filtering
-  const filteredProducts = sortedProducts.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.sku.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProducts = React.useMemo(
+    () => sortedProducts.filter(product =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.sku.toLowerCase().includes(searchTerm.toLowerCase())
+    ),
+    [sortedProducts, searchTerm]
   );
 
   // Calculate summary data
   const totalProducts = filteredByStockStatus.length;
   const totalValue = filteredByStockStatus.reduce((sum, product) => sum + product.value * product.quantity, 0);
 
-  const stockStatusCount = filteredByStockStatus.reduce(
-    (acc, product) => {
-      if (product.quantity > 0) {
-        acc.inStock += 1;
-      } else if (product.quantity === 0) {
-        acc.lowStock += 1;
-      } else {
-        acc.outOfStock += 1;
-      }
-      return acc;
-    },
-    { inStock: 0, lowStock: 0, outOfStock: 0 }
+  // Calculate stock status counts
+  const stockStatusCount = React.useMemo(
+    () => ({
+      inStock: filteredProducts.filter((p) => p.quantity > 10).length,
+      lowStock: filteredProducts.filter((p) => p.quantity <= 10 && p.quantity > 0).length,
+      outOfStock: filteredProducts.filter((p) => p.quantity <= 0).length,
+    }),
+    [filteredProducts]
   );
 
   return (
@@ -220,13 +232,6 @@ const InventoryDash: React.FC<InventoryDashProps> = ({ allData }) => {
               </th>
               <th
                 className="p-2 cursor-pointer"
-                onClick={() => handleSort("quantity")}
-              >
-                Quantity{" "}
-                {sortColumn === "quantity" && (sortDirection === "asc" ? "↑" : "↓")}
-              </th>
-              <th
-                className="p-2 cursor-pointer"
                 onClick={() => handleSort("value")}
               >
                 Value{" "}
@@ -234,75 +239,45 @@ const InventoryDash: React.FC<InventoryDashProps> = ({ allData }) => {
               </th>
               <th
                 className="p-2 cursor-pointer"
-                onClick={() => handleSort("status")}
+                onClick={() => handleSort("quantity")}
               >
-                Status{" "}
-                {sortColumn === "status" && (sortDirection === "asc" ? "↑" : "↓")}
+                Quantity{" "}
+                {sortColumn === "quantity" && (sortDirection === "asc" ? "↑" : "↓")}
               </th>
               <th
                 className="p-2 cursor-pointer"
                 onClick={() => handleSort("userCount")}
               >
-                Number of Users{" "}
+                User Count{" "}
                 {sortColumn === "userCount" && (sortDirection === "asc" ? "↑" : "↓")}
               </th>
               <th className="p-2">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredProducts.length > 0 ? (
-              filteredProducts.map((product) => (
-                <tr
-                  key={product.id}
-                  className="border-b dark:border-gray-700"
-                >
-                  <td
-                    className="p-2 truncate text-black dark:text-gray-300 cursor-pointer"
-                    onClick={() => handleProductClick(product)}
+            {filteredProducts.map(product => (
+              <tr key={product.id} className="border-b dark:border-gray-700">
+                <td className="p-2">{product.name}</td>
+                <td className="p-2">{product.type}</td>
+                <td className="p-2">${product.value.toFixed(2)}</td>
+                <td className="p-2">{product.quantity}</td>
+                <td className="p-2">{product.userCount}</td>
+                <td className="p-2 flex space-x-2">
+                  <button
+                    onClick={() => handleEditProduct(product)}
+                    className="p-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600"
                   >
-                    {product.name}
-                  </td>
-                  <td className="p-2 text-black dark:text-gray-300">
-                    {product.type}
-                  </td>
-                  <td className="p-2 text-black dark:text-gray-300">
-                    {product.quantity}
-                  </td>
-                  <td className="p-2 text-black dark:text-gray-300">
-                    ${product.value.toFixed(2)}
-                  </td>
-                  <td className="p-2 text-black dark:text-gray-300">
-                    {product.status}
-                  </td>
-                  <td className="p-2 text-black dark:text-gray-300">
-                    {product.userCount}
-                  </td>
-                  <td className="p-2">
-                    <button
-                      onClick={() => handleEditProduct(product)}
-                      className="p-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 mr-2"
-                    >
-                      <Edit size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteProduct(product.id)}
-                      className="p-1 bg-red-500 text-white rounded-md hover:bg-red-600"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan={7}
-                  className="p-4 text-center text-gray-500 dark:text-gray-400"
-                >
-                  No products found
+                    <Edit size={16} />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteProduct(product.id)}
+                    className="p-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                  >
+                    <Trash2 size={16} />
+                  </button>
                 </td>
               </tr>
-            )}
+            ))}
           </tbody>
         </table>
       </div>
