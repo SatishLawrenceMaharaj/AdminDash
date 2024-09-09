@@ -1,0 +1,56 @@
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+@import "~leaflet/dist/leaflet.css";
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root,
+.app {
+  height: 100%;
+  width: 100%;
+  @apply text-sm;
+  @apply bg-gray-500;
+  @apply text-gray-900;
+}
+
+@media (min-width: 768px) {
+  .custom-grid-rows {
+    grid-template-rows: repeat(8, 20vh);
+  }
+}
+
+@media (min-width: 1280px) {
+  .custom-grid-rows {
+    grid-template-rows: repeat(8, 7.5vh);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 12px; /* Width of the scrollbar */
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  @apply bg-gray-300 dark:bg-gray-700; /* Track background */
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-500 dark:bg-gray-600 rounded-lg; /* Handle color and round edges */
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-700 dark:bg-gray-500; /* Handle color on hover */
+}

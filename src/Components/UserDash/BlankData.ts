@@ -1,0 +1,15 @@
+export const BlankData = {
+  id: 0,
+  name: "",
+  status: "",
+  inventoryValue: 0,
+  lastLogin: "",
+  email: "",
+  image: "",
+  location: { lat: 0, lng: 0 },
+  registrationDate: "",
+  totalOrders: 0,
+  activityData: [],
+  products: [], 
+  userData: { userName: "", totalValue: 0 }, 
+};
