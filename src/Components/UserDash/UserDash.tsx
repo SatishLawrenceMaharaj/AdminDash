@@ -177,7 +177,7 @@ const UserDash: React.FC<UserDashProps> = ({ usersData }) => {
             filteredUsers.map((user) => (
               <div
                 key={user.id}
-                className="relative p-4 bg-gray-50 dark:bg-gray-800 shadow-md rounded-md flex flex-col items-center"
+                className="relative p-4 bg-gray-50 dark:bg-gray-800 shadow-md rounded-md flex flex-col items-center cursor-pointer"
                 onClick={() => handleUserClick(user)} // Click to redirect
               >
                 {/* Edit and Delete Buttons */}

@@ -6,12 +6,9 @@ import {
     YAxis,
     Tooltip,
     ResponsiveContainer,
-    BarChart,
-    Bar,
     Legend,
   } from "recharts";
   import React from "react";
-import { User } from "../UserDash/User";
   
   interface ChartProps {
     data: { name: string; quantity: number; value: number }[];
