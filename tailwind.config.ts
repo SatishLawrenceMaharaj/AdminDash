@@ -51,7 +51,7 @@ const themes = {
     white: colors.gray["950"],
     black: colors.gray["50"],
   },
-}
+};
 
 const config: Config = {
   darkMode: "class",
