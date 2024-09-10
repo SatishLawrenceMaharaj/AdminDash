@@ -4,11 +4,9 @@ import { setIsSidebarCollapsed } from "@/app/state";
 import {
   Archive,
   BarChart2,
-  BicepsFlexed,
   LucideIcon,
   Menu,
   Settings,
-  SlidersHorizontal,
   Users,
 } from "lucide-react";
 import Link from "next/link";
