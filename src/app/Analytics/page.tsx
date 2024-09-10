@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import {
   LineChart,
   Line,
@@ -19,11 +19,13 @@ import {
   LineChart as LineChartIcon,
   PieChart as PieChartIcon,
   Download as DownloadIcon,
+  MapPin as MapIcon,
 } from "lucide-react";
 import { Tab } from "@headlessui/react";
 import Papa from "papaparse";
 
 import { allData } from "../../../public/data";
+import MapModal from "@/Components/Map/UserLocationMap";
 
 const COLORS = [
   "#0088FE",
@@ -35,6 +37,8 @@ const COLORS = [
 ];
 
 const AnalyticsPage = () => {
+  const [showMap, setShowMap] = useState(false); // State to handle map visibility
+
   // Aggregate data for charts and tabs
   const users = allData;
   const activityData = users.flatMap((user) =>
@@ -107,6 +111,10 @@ const AnalyticsPage = () => {
     link.click();
   };
 
+  const handleMapClick = () => {
+    setShowMap(true); // Show the map when the MapIcon is clicked
+  };
+  const closeMapModal = () => setShowMap(false);
   return (
     <>
       {/* Summary Data Section */}
@@ -388,6 +396,19 @@ const AnalyticsPage = () => {
           </Tab.Group>
         </div>
       </div>
+      {/* Floating Map Button */}
+      <div className="fixed bottom-6 right-6">
+        <button
+          className="flex items-center space-x-2 p-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg shadow-md"
+          onClick={handleMapClick}
+        >
+          <MapIcon className="text-blue-500" />
+          <span>Show User Locations</span>
+        </button>
+      </div>
+
+      {/* Map Modal */}
+      <MapModal isOpen={showMap} onClose={closeMapModal} />
     </>
   );
 };
