@@ -35,6 +35,7 @@ export interface Product {
   sku: string;
   status: string;
   data: { name: string; quantity: number; value: number }[];
+  users?: User[]; 
 }
 
 export interface Data {

@@ -4,6 +4,7 @@ import { Product, User } from "../UserDash/User";
 import { Edit, Eye, Trash2, X } from "lucide-react";
 import Chart from "./Chart";
 import PieChart from "./PieChart";
+import { BlankData } from "./BlankData";
 
 interface InventoryDashProps {
   allData: User[];
@@ -16,6 +17,10 @@ const InventoryDash: React.FC<InventoryDashProps> = ({ allData }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isViewing, setIsViewing] = useState<boolean>(false);
+  const [isAdding, setIsAdding] = useState<boolean>(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [productForm, setProductForm] = useState<Product>(BlankData);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   // State for managing products
   const [products, setProducts] = useState<Product[]>(() =>
@@ -38,7 +43,8 @@ const InventoryDash: React.FC<InventoryDashProps> = ({ allData }) => {
   };
 
   const handleAddProduct = () => {
-    // Implement add product logic here
+    setIsAdding(true);
+    setProductForm(BlankData);
   };
 
   const handleProductClick = (product: Product) => {
@@ -47,10 +53,38 @@ const InventoryDash: React.FC<InventoryDashProps> = ({ allData }) => {
   };
 
   const handleEditProduct = (product: Product) => {
-    // Implement edit product logic here
-    console.log("Product clicked:", product);
+    setIsEditing(true);
+    setProductForm({ ...product });
   };
 
+  const handleSaveProduct = () => {
+    if (isAdding) {
+      if (selectedUser) {
+        // Add product to selected user
+        const newProduct = { ...productForm, id: Date.now() };
+        setProducts((prevProducts) => [...prevProducts, newProduct]);
+
+        // Add the product to the selected user's product list
+        setProducts((prevProducts) =>
+          prevProducts.map((product) =>
+            product.id === newProduct.id
+              ? { ...product, users: [...(product.users || []), selectedUser] }
+              : product
+          )
+        );
+      }
+    } else if (isEditing) {
+      setProducts(
+        products.map((product) =>
+          product.id === productForm.id ? productForm : product
+        )
+      );
+    }
+    setIsAdding(false);
+    setIsEditing(false);
+    setProductForm(BlankData);
+    setSelectedUser(null); // Reset selected user
+  };
   const handleDeleteProduct = useCallback((productId: number) => {
     // Remove the product from the state
     setProducts((prevProducts) =>
@@ -60,6 +94,9 @@ const InventoryDash: React.FC<InventoryDashProps> = ({ allData }) => {
   }, []);
 
   const handleCancel = () => {
+    setIsAdding(false);
+    setIsEditing(false);
+    setSelectedUser(null);
     setIsViewing(false);
     setSelectedProduct(null);
   };
@@ -319,6 +356,161 @@ const InventoryDash: React.FC<InventoryDashProps> = ({ allData }) => {
           </tbody>
         </table>
       </div>
+      {/* Modal for Adding/Editing Product */}
+      {(isAdding || isEditing) && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop with blur */}
+          <div className="fixed inset-0 bg-gray-900 bg-opacity-50 dark:bg-gray-500 backdrop-blur-sm z-40"></div>
+
+          {/* Modal content */}
+          <div
+            className="relative bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg w-1/2 h-[90vh] overflow-y-auto z-50"
+            onClick={(e) => e.stopPropagation()} // Prevent click from closing modal
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold">
+                {isAdding ? "Add Product" : "Edit Product"}
+              </h3>
+              <button
+                onClick={handleCancel}
+                className="text-gray-500 dark:text-gray-300 hover:text-red-500"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form>
+              <div className="space-y-4">
+                <label className="block mb-4">
+                  <span className="text-gray-700 dark:text-gray-300">
+                    Select User
+                  </span>
+                  <select
+                    value={selectedUser ? selectedUser.id : ""}
+                    onChange={(e) =>
+                      setSelectedUser(
+                        allData.find(
+                          (user) => user.id === parseInt(e.target.value, 10)
+                        ) || null
+                      )
+                    }
+                    className="w-full p-2 border rounded-md dark:bg-gray-800 dark:border-gray-700"
+                  >
+                    <option value="">Select a user</option>
+                    {allData.map((user) => (
+                      <option key={user.id} value={user.id}>
+                        {user.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {/* Name Field */}
+                <label className="block">
+                  Name:
+                  <input
+                    type="text"
+                    value={productForm.name}
+                    onChange={(e) =>
+                      setProductForm({ ...productForm, name: e.target.value })
+                    }
+                    className="w-full p-2 border rounded-md dark:bg-gray-800 dark:border-gray-700"
+                  />
+                </label>
+
+                {/* Type Field */}
+                <label className="block">
+                  Type:
+                  <input
+                    type="text"
+                    value={productForm.type}
+                    onChange={(e) =>
+                      setProductForm({ ...productForm, type: e.target.value })
+                    }
+                    className="w-full p-2 border rounded-md dark:bg-gray-800 dark:border-gray-700"
+                  />
+                </label>
+
+                {/* Value Field */}
+                <label className="block">
+                  Value:
+                  <input
+                    type="number"
+                    value={productForm.value}
+                    onChange={(e) =>
+                      setProductForm({
+                        ...productForm,
+                        value: parseFloat(e.target.value),
+                      })
+                    }
+                    className="w-full p-2 border rounded-md dark:bg-gray-800 dark:border-gray-700"
+                  />
+                </label>
+
+                {/* Quantity Field */}
+                <label className="block">
+                  Quantity:
+                  <input
+                    type="number"
+                    value={productForm.quantity}
+                    onChange={(e) =>
+                      setProductForm({
+                        ...productForm,
+                        quantity: parseInt(e.target.value),
+                      })
+                    }
+                    className="w-full p-2 border rounded-md dark:bg-gray-800 dark:border-gray-700"
+                  />
+                </label>
+
+                {/* SKU Field */}
+                <label className="block">
+                  SKU:
+                  <input
+                    type="text"
+                    value={productForm.sku}
+                    onChange={(e) =>
+                      setProductForm({ ...productForm, sku: e.target.value })
+                    }
+                    className="w-full p-2 border rounded-md dark:bg-gray-800 dark:border-gray-700"
+                  />
+                </label>
+
+                {/* Status Field */}
+                <label className="block">
+                  Status:
+                  <select
+                    value={productForm.status}
+                    onChange={(e) =>
+                      setProductForm({ ...productForm, status: e.target.value })
+                    }
+                    className="w-full p-2 border rounded-md dark:bg-gray-800 dark:border-gray-700"
+                  >
+                    <option value="in stock">In Stock</option>
+                    <option value="low stock">Low Stock</option>
+                    <option value="out of stock">Out of Stock</option>
+                  </select>
+                </label>
+
+                <div className="flex space-x-4 mt-4">
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    className="p-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSaveProduct}
+                    className="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                  >
+                    {isAdding ? "Add Product" : "Save Changes"}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Product View Modal */}
       {isViewing && selectedProduct && (
