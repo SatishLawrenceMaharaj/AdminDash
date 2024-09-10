@@ -119,23 +119,9 @@ const Sidebar = () => {
         />
         {/* Analytics & Reporting */}
         <SidebarLinks
-          href="/"
+          href="/Analytics"
           icon={BarChart2}
           label="Analytics"
-          isCollapsed={isSidebarCollapsed}
-        />
-        {/* Admin Features */}
-        <SidebarLinks
-          href="/"
-          icon={BicepsFlexed}
-          label="Admin"
-          isCollapsed={isSidebarCollapsed}
-        />
-        {/* Additional Utilities */}
-        <SidebarLinks
-          href="/"
-          icon={SlidersHorizontal}
-          label="Utilities"
           isCollapsed={isSidebarCollapsed}
         />
         <SidebarLinks
