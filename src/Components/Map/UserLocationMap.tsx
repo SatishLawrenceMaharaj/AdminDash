@@ -90,7 +90,7 @@ const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ss
 
 const MapModal: React.FC<{ isOpen: boolean, onClose: () => void }> = ({ isOpen, onClose }) => {
   const [isClient, setIsClient] = useState(false);
-  const [L, setLeaflet] = useState<any>(null); // Store Leaflet instance
+  const [L, setLeaflet] = useState<typeof import('leaflet') | null>(null); // Use correct Leaflet type
   const router = useRouter();
 
   // Ensure the component is rendered only on the client side
