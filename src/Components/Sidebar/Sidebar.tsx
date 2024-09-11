@@ -4,6 +4,7 @@ import { setIsSidebarCollapsed } from "@/app/state";
 import {
   Archive,
   BarChart2,
+  Eye,
   LucideIcon,
   Menu,
   Settings,
@@ -120,6 +121,12 @@ const Sidebar = () => {
           href="/Analytics"
           icon={BarChart2}
           label="Analytics"
+          isCollapsed={isSidebarCollapsed}
+        />
+        <SidebarLinks
+          href="/Overview"
+          icon={Eye}
+          label="Overview Dashboard"
           isCollapsed={isSidebarCollapsed}
         />
         <SidebarLinks
