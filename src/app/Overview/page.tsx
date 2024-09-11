@@ -437,7 +437,7 @@ function Page() {
   );
 
   return (
-    <div className="dark:bg-gray-900 dark:text-gray-100">
+    <div className="p-4 dark:bg-gray-900 dark:text-gray-100">
       <div className="p-4 rounded-lg mb-4 bg-white dark:bg-gray-800">
         <div className="flex items-center justify-between">
           <div className="flex-1 text-center p-2">
@@ -660,12 +660,12 @@ function Page() {
               </div>
 
               <div className="flex-1 flex gap-4" style={{ flex: "2 1 0" }}>
-                <div
-                  className="flex-1 bg-white dark:bg-gray-800 p-4 pb-0 rounded-lg shadow-md "
+              <div
+                  className="flex-1 bg-white dark:bg-gray-800 p-3 pb-0 rounded-lg shadow-md h-52"
                   style={{ flex: "4" }}
                 >
-                  <h2 className="text-lg font-semibold mb-2">Product Demand</h2>
-                  <BarChart width={350} height={195} data={salesData}>
+                  <h2 className="text-lg font-semibold mb-1">Product Demand</h2>
+                  <BarChart width={300} height={150} data={salesData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
@@ -674,11 +674,11 @@ function Page() {
                   </BarChart>
                 </div>
                 <div
-                  className="flex-1 bg-white dark:bg-gray-800 p-4 pb-0 rounded-lg shadow-md "
+                  className="flex-1 bg-white dark:bg-gray-800 p-3 pb-0 rounded-lg shadow-md h-52"
                   style={{ flex: "6" }}
                 >
-                  <h2 className="text-lg font-semibold mb-2">Product Sales</h2>
-                  <BarChart width={350} height={195} data={salesData}>
+                  <h2 className="text-lg font-semibold mb-1">Product Sales</h2>
+                  <BarChart width={300} height={150} data={salesData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
