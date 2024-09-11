@@ -112,11 +112,11 @@ const MapModal: React.FC<{ isOpen: boolean, onClose: () => void }> = ({ isOpen, 
 
   if (!isOpen || !isClient || !L) return null;
 
-  // Configure the default marker icon only on the client side
-  delete L.Icon.Default.prototype._getIconUrl;
-
-  const DefaultIcon = L.icon({
-    iconUrl: '/marker-icon.png',
+  // Configure the default marker icon with explicit URLs for the icon and shadow
+  const DefaultIcon = new L.Icon({
+    iconUrl: '/marker-icon.png', // Path to your marker icon
+    iconRetinaUrl: '/marker-icon-2x.png', // Path to retina version of the marker
+    shadowUrl: '/marker-shadow.png', // Path to the marker shadow
     iconSize: [25, 41],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
